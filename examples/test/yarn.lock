@@ -4041,9 +4041,9 @@ nan@^2.3.0:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.6.2.tgz#e4ff34e6c95fdfb5aecc08de6596f43605a7db45"
 
-nano-date@^0.0.0-rc23:
-  version "0.0.0-rc23"
-  resolved "https://registry.yarnpkg.com/nano-date/-/nano-date-0.0.0-rc23.tgz#16ec3ba75ced0f97fbc3e51b7d80ea08de51b43b"
+nano-date@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/nano-date/-/nano-date-1.1.0.tgz#7f4d1acb46c4ca99344691a6f402e02798723489"
   dependencies:
     bignumber.js "^4.0.2"
     core-decorators "^0.19.0"

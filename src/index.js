@@ -53,6 +53,9 @@ function addZeros(str, count = 0, front = false) {
 function toNano(num) {
   const str = `${num}`;
   if (str.length <= DIGETS_IN_NANO) {
+    if (str.indexOf('.') > -1) {
+      return new BigNumber(str.replace('.', '') + '000');
+    }
     return new BigNumber(str);
   }
   return new BigNumber(str.slice(0, DIGETS_IN_NANO));
@@ -62,7 +65,8 @@ function onlyDigets(num) {
   return /^(-)?\d+$/.test(`${num}`);
 }
 
-function leapYear(year) {
+function leapYear(yearBase) {
+  const year = yearBase.toNumber();
   return ((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0);
 }
 
@@ -71,7 +75,7 @@ function daysForYear(year) {
 }
 
 function daysForMonth(month) {
-  return DAYS[month];
+  return DAYS[month.toNumber()];
 }
 
 function handleNotAnInteger(items, funcName, names, index = 0) {
@@ -94,9 +98,9 @@ function buildSetFunction(scope, name, argumentNames, getMethod, valueKey, moreV
     const currentValue = getMethod();
     if (currentValue !== args[0]) {
       if (currentValue < args[0]) {
-        scope._full = scope._full.plus(scope._getValue.call(scope, scope, valueKey, args[0] - currentValue));
+        scope._full = scope._full.plus(scope._getValue.call(scope, scope, valueKey, args[0] - currentValue)).truncated();
       } else {
-        scope._full = scope._full.minus(scope._getValue.call(scope, scope, valueKey, currentValue - args[0]));
+        scope._full = scope._full.minus(scope._getValue.call(scope, scope, valueKey, currentValue - args[0])).truncated();
       }
 
       if (args.length === 1 || (args.length > 1 && !notUndefined(args[1]))) {
@@ -132,6 +136,7 @@ const passThroughMethods = [
   'getUTCMonth',
   'getUTCDate',
   'getUTCDay',
+  'getUTCHours',
   'getUTCMinutes',
   'getUTCSeconds',
   'getUTCMilliseconds',
@@ -155,7 +160,6 @@ class NanoDate {
       } else if (a instanceof Date) {
         this._full = toNano(a.valueOf() * MILLI_TO_NANO_DIFF);
       } else if (typeof a === 'number') {
-        const strLength = `${a}`.length;
         this._full = toNano(a);
       } else {
         throw Error('Input not of any type that can be converted to a date');
@@ -179,55 +183,56 @@ class NanoDate {
 
   @decorate(memoize(250))
   _getDaysBetween(a, b, func) {
-    if (a === b) { return 0; }
-    let days = 0;
-    const diff = (a < b) ? 1 : -1;
-    let start = parseInt(`${a}`, 10);
-    while (start !== b) {
-      days += func(start);
-      start += diff;
+    if (a.eq(b)) { return new BigNumber(0); }
+    let days = new BigNumber(0);
+    const diff = a.lt(b) ? 1 : -1;
+    let start = new BigNumber(a);
+    while (!start.eq(b)) {
+      days = days.plus(func(start));
+      start = start.plus(diff);
     }
-    return days * diff;
+    return days.times(diff);
   }
 
   _getDays(unit) {
-    let base = parseInt(`${unit}`, 10);
-    let res = 0;
+    let base = new BigNumber(unit);
+    let res = new BigNumber(0);
     if (unit >= 12) {
-      const years = parseInt((base / 12).toFixed(0), 10);
-      const start = this.getFullYear();
-      const end = start + years;
+      const years = base.dividedToIntegerBy(12);
+      const start = new BigNumber(this.getFullYear());
+      const end = start.plus(years);
       res = this._getDaysBetween(start, end, daysForYear);
-      base += ((years * 12) * (base < 0 ? 1 : -1));
+      base = base.plus(years.times(12).times(base.lessThan(0) ? 1 : -1));
     }
 
-    const start = this.getMonth();
-    const end = start + base;
-    return res + this._getDaysBetween(start, end, daysForMonth);
+    const start = new BigNumber(this.getMonth());
+    const end = start.plus(base);
+    return res.plus(this._getDaysBetween(start, end, daysForMonth));
   }
 
   @decorate(memoize(100))
   _getValue(scope, type, unit) {
+    const numUnit = new BigNumber(unit);
     switch (type) {
       case YEAR:
-        return scope._getValue(scope, MONTH, unit * 12);
+        return scope._getValue(scope, MONTH, numUnit.times(12));
       case MONTH:
         return scope._getValue(scope, DAY, scope._getDays(unit));
       case DAY:
-        return scope._getValue(scope, HOUR, unit * 24);
+        return scope._getValue(scope, HOUR, unit.times(24));
       case HOUR:
-        return scope._getValue(scope, MINUTE, unit * 60);
+        return scope._getValue(scope, MINUTE, unit.times(60));
       case MINUTE:
-        return scope._getValue(scope, SECOND, unit * 60);
+        return scope._getValue(scope, SECOND, unit.times(60));
       case SECOND:
-        return scope._getValue(scope, MILLI, unit * 1000);
+        return scope._getValue(scope, MILLI, unit.times(1000));
       case MILLI:
-        return scope._getValue(scope, MICRO, unit * 1000);
+        return scope._getValue(scope, MICRO, unit.times(1000));
       case MICRO:
-        return scope._getValue(scope, NANO, unit * 1000);
+        return scope._getValue(scope, NANO, unit.times(1000));
       case NANO:
       default:
-        return parseInt(unit.toFixed(0), 10);
+        return unit;
     }
   }
 
@@ -248,29 +253,31 @@ class NanoDate {
   }
 
   valueOf() {
-    return parseInt(this._full.dividedBy(MILLI_TO_NANO_DIFF).toNumber().toFixed(0), 10);
+    return this._full.dividedBy(MILLI_TO_NANO_DIFF).truncated().toNumber();
+  }
+
+  valueOfWithMicro() {
+    return parseFloat(`${this.valueOf()}.${pad(this.getMicroseconds())}`, 10);
+  }
+
+  valueOfWithNano() {
+    return `${this.valueOfWithMicro()}${pad(this.getNanoseconds())}`;
   }
 
   getMicroseconds() {
-    return parseInt(
-      this._full
-        .minus(this.valueOf() * MILLI_TO_NANO_DIFF)
-        .dividedBy(1000)
-        .toNumber()
-        .toFixed(0),
-      10
-    );
+    return this._full
+      .minus(this.valueOf() * MILLI_TO_NANO_DIFF)
+      .dividedBy(1000)
+      .truncated()
+      .toNumber();
   }
 
   getNanoseconds() {
-    return parseInt(
-      this._full
-        .minus(this.valueOf() * MILLI_TO_NANO_DIFF)
-        .minus(this.getMicroseconds() * 1000)
-        .toNumber()
-        .toFixed(0),
-      10
-    );
+    return this._full
+      .minus(this.valueOf() * MILLI_TO_NANO_DIFF)
+      .minus(this.getMicroseconds() * 1000)
+      .truncated()
+      .toNumber();
   }
 
   _buildSetFunctions() {
@@ -354,7 +361,7 @@ class NanoDate {
     const milli = this.getMilliseconds();
     const micro = this.getMicroseconds();
     const nano = this.getNanoseconds();
-    split[0] += `.${pad(milli)}.${pad(micro)}.${pad(nano)}`
+    split[0] += `.${pad(milli)}${pad(micro)}${pad(nano)}`
     return split.join(' GMT');
   }
 
@@ -366,7 +373,7 @@ class NanoDate {
     return this._toString('toUTCString');
   }
 
-  @deprecate('use toUTCString()')
+  @deprecate('Use toUTCString() instead')
   toGMTString() {
     return this.toUTCString();
   }
