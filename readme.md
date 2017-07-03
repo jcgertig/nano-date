@@ -1,4 +1,12 @@
 # Nano Date
+
+![Downloads](https://img.shields.io/npm/dm/nano-date.svg)
+![Downloads](https://img.shields.io/npm/dt/nano-date.svg)
+![npm version](https://img.shields.io/npm/v/nano-date.svg)
+![dependencies](https://img.shields.io/david/jcgertig/nano-date.svg)
+![dev dependencies](https://img.shields.io/david/dev/jcgertig/nano-date.svg)
+![License](https://img.shields.io/npm/l/nano-date.svg)
+
 __Date class that supports up to nano seconds__
 
 All of the normal date class functions with a few addtions.
@@ -39,7 +47,7 @@ nanoDate.setNanoseconds(25); // 25
 nanoDate.toString(); // ie "Mon Jun 12 2017 12:57:05.089999999 GMT-0500 (CDT)"
 ```
 
-- `valueOf` && `Date.now()` - returns a integer of millisecond precision
+- `valueOf` && `NanoDate.now()` - returns a integer of millisecond precision
 
 - `valueOfWithMicro` - returns a float with microsecond precision
 ```javascript

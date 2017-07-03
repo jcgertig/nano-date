@@ -1,6 +1,6 @@
 {
   "name": "nano-date",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Date class that supports up to nano seconds",
   "main": "lib/index.js",
   "scripts": {
