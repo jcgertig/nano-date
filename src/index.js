@@ -241,7 +241,7 @@ class NanoDate {
   }
 
   static parse(...args) {
-    return new NanoDate(...args);
+    return new NanoDate(new Date().parse(...args));
   }
 
   static UTC(...args) {
