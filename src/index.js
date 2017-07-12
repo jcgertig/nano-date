@@ -61,7 +61,7 @@ function toNano(num) {
   return new BigNumber(str.slice(0, DIGETS_IN_NANO));
 }
 
-function onlyDigets(num) {
+function onlyDigits(num) {
   return /^(-)?\d+$/.test(`${num}`);
 }
 
@@ -81,7 +81,7 @@ function daysForMonth(month) {
 function handleNotAnInteger(items, funcName, names, index = 0) {
   const item = items[index];
   const name = names[index];
-  if (typeof item !== 'number' || !onlyDigets(item)) {
+  if (typeof item !== 'number' || !onlyDigits(item)) {
     throw new Error(`Parameter ${name} value for ${funcName} has to be an integer.`);
   } else if (names.length > index && notUndefined(items[index + 1])) {
     handleNotAnInteger(items, funcName, names, index + 1);
@@ -151,7 +151,7 @@ const passThroughMethods = [
 class NanoDate {
   constructor(a, month, day, hour, minute, second, millisecond) {
     if (typeof a === 'string') {
-      this._full = onlyDigets(a) ? toNano(a) : toNano(new Date(a).valueOf() * MILLI_TO_NANO_DIFF);
+      this._full = onlyDigits(a) ? toNano(a) : toNano(new Date(a).valueOf() * MILLI_TO_NANO_DIFF);
     } else if (arguments.length === 0) {
       this._full = toNano(new Date().valueOf() * MILLI_TO_NANO_DIFF);
     } else if (arguments.length === 1) {
@@ -160,7 +160,11 @@ class NanoDate {
       } else if (a instanceof Date) {
         this._full = toNano(a.valueOf() * MILLI_TO_NANO_DIFF);
       } else if (typeof a === 'number') {
-        this._full = toNano(a);
+        let multi = MILLI_TO_NANO_DIFF;
+        if (`${a}`.indexOf('.') > -1) {
+          multi = 1;
+        }
+        this._full = toNano(a * multi);
       } else {
         throw Error('Input not of any type that can be converted to a date');
       }
