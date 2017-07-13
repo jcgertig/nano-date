@@ -51,9 +51,10 @@ function addZeros(str, count = 0, front = false) {
 }
 
 function toNano(num) {
-  const str = `${num}`;
+  let str = `${num}`;
   if (str.length <= DIGETS_IN_NANO) {
     if (str.indexOf('.') > -1) {
+      str = num.toFixed(3);
       return new BigNumber(str.replace('.', '') + '000');
     }
     return new BigNumber(str);
@@ -171,7 +172,7 @@ class NanoDate {
       }
     } else {
       const d = new Date(a, month || 0, day || 0, hour || 0, minute || 0, second || 0, millisecond || 0);
-      this._full = toNano(d.valueOf());
+      this._full = toNano(d.valueOf() * MILLI_TO_NANO_DIFF);
     }
 
     this._setupFunctions();
