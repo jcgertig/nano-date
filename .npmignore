@@ -23,7 +23,6 @@
 *.orig
 
 work
-build
 src
 examples
 test
@@ -35,6 +34,7 @@ lib-cov
 html-report
 xunit.xml
 .babelrc
+rollup.config.js
 
 .project
 .idea
