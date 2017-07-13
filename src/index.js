@@ -144,7 +144,8 @@ const passThroughMethods = [
   'toLocaleDateString',
   'toLocaleString',
   'toLocaleTimeString',
-  'toISOString'
+  'toISOString',
+  'getTimezoneOffset'
 ];
 
 @autobind

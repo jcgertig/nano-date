@@ -1,11 +1,11 @@
 {
   "name": "nano-date",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Date class that supports up to nano seconds",
   "main": "lib/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "compile": "babel src/ --out-dir lib",
+    "rollup": "rollup -c",
+    "compile": "babel src/ --out-dir lib && npm run rollup",
     "prepublish": "npm run compile"
   },
   "repository": {
