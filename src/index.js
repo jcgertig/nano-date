@@ -223,22 +223,22 @@ class NanoDate {
       case YEAR:
         return scope._getValue(scope, MONTH, numUnit.times(12));
       case MONTH:
-        return scope._getValue(scope, DAY, scope._getDays(unit));
+        return scope._getValue(scope, DAY, scope._getDays(numUnit));
       case DAY:
-        return scope._getValue(scope, HOUR, unit.times(24));
+        return scope._getValue(scope, HOUR, numUnit.times(24));
       case HOUR:
-        return scope._getValue(scope, MINUTE, unit.times(60));
+        return scope._getValue(scope, MINUTE, numUnit.times(60));
       case MINUTE:
-        return scope._getValue(scope, SECOND, unit.times(60));
+        return scope._getValue(scope, SECOND, numUnit.times(60));
       case SECOND:
-        return scope._getValue(scope, MILLI, unit.times(1000));
+        return scope._getValue(scope, MILLI, numUnit.times(1000));
       case MILLI:
-        return scope._getValue(scope, MICRO, unit.times(1000));
+        return scope._getValue(scope, MICRO, numUnit.times(1000));
       case MICRO:
-        return scope._getValue(scope, NANO, unit.times(1000));
+        return scope._getValue(scope, NANO, numUnit.times(1000));
       case NANO:
       default:
-        return unit;
+        return numUnit;
     }
   }
 
@@ -267,7 +267,7 @@ class NanoDate {
   }
 
   valueOfWithNano() {
-    return `${this.valueOfWithMicro()}${pad(this.getNanoseconds())}`;
+    return `${this.valueOfWithMicro().toFixed(3)}${pad(this.getNanoseconds())}`;
   }
 
   getMicroseconds() {
