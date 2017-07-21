@@ -144,6 +144,7 @@ const passThroughMethods = [
   'toDateString',
   'toLocaleDateString',
   'toLocaleString',
+  'toTimeString',
   'toLocaleTimeString',
   'toISOString',
   'getTimezoneOffset'
