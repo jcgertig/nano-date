@@ -20,5 +20,5 @@ export default {
     uglify()
   ],
   dest: 'build/nano-date.js',
-  sourceMap: true
+  sourceMap: true,
 };
