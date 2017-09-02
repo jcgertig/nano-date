@@ -1,5 +1,15 @@
 {
   "env": {
+    "development": {
+      "presets": [
+        "es2015",
+        "stage-0"
+      ],
+      "plugins": [
+        "transform-decorators-legacy",
+        "transform-es2015-modules-umd"
+      ]
+    },
     "npm": {
       "presets": [
         "es2015",
