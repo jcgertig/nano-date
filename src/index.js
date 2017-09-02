@@ -187,19 +187,19 @@ class NanoDate {
 
         // set milliseconds
         if (nanos > 0) {
-          this.setMilliseconds(Math.floor(nanos / MILLI_TO_NANO_DIFF))
-          nanos = nanos % MILLI_TO_NANO_DIFF
+          this.setMilliseconds(Math.floor(nanos / MILLI_TO_NANO_DIFF));
+          nanos = nanos % MILLI_TO_NANO_DIFF;
         }
 
         // set microseconds
         if (nanos > 0) {
-          this.setMicroseconds(Math.floor(nanos / 1000))
-          nanos = nanos % 1000
+          this.setMicroseconds(Math.floor(nanos / 1000));
+          nanos = nanos % 1000;
         }
 
         // set nanoseconds
         if (nanos > 0) {
-          this.setNanoseconds(Math.floor(nanos))
+          this.setNanoseconds(Math.floor(nanos));
         }
       }
     }
