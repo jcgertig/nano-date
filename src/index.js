@@ -9,6 +9,8 @@ if (typeof window === 'undefined') {
   var Date = window['Date'];
 }
 
+const ISO_8601_FULL = /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|Z)?$/i;
+
 const MILLI_TO_NANO_DIFF = 1000000;
 const DIGETS_IN_NANO = 19;
 const DIGETS_IN_MILLI = 13;
@@ -250,8 +252,7 @@ class NanoDate {
   static parseISO( str ) {
     //lets capture the nanoseconds
     //examples are: 1997-07-16T19:20:30.45+01:00, 2017-08-17T17:04:35.160744338Z
-    let re = /.*\.(\d+)[+-Z].*/
-    let match = str.match(re)
+    let match = str.match(ISO_8601_FULL)
     var date = new NanoDate(new Date(str))
     if (match != undefined && match.length == 2) {
       let nanos = match[1];
