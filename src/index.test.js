@@ -7,5 +7,5 @@ test('test parsing date simple with nanoseconds', () => {
 	expect(date.getMicroseconds()).toBe(744);
 	expect(date.getMilliseconds()).toBe(160);
 	expect(date.valueOfWithNano()).toBe("1502989475160.744338");
-	expect(date.getTime()).toBe("1502989475160744338")
+	expect(date.getTime()).toBe("1502989475160744338");
 })
