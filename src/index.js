@@ -179,6 +179,30 @@ class NanoDate {
     }
 
     this._setupFunctions();
+
+    if (typeof a === 'string' && ISO_8601_FULL.test(a) && a.indexOf('.') > -1) {
+      const match = a.match(ISO_8601_FULL);
+      if (typeof match[1] !== 'undefined') {
+        let nanos = parseInt(pad(match[1].replace('.', ''), 9), 10);
+
+        // set milliseconds
+        if (nanos > 0) {
+          this.setMilliseconds(Math.floor(nanos / MILLI_TO_NANO_DIFF))
+          nanos = nanos % MILLI_TO_NANO_DIFF
+        }
+
+        // set microseconds
+        if (nanos > 0) {
+          this.setMicroseconds(Math.floor(nanos / 1000))
+          nanos = nanos % 1000
+        }
+
+        // set nanoseconds
+        if (nanos > 0) {
+          this.setNanoseconds(Math.floor(nanos))
+        }
+      }
+    }
   }
 
   _setupFunctions() {
@@ -247,37 +271,6 @@ class NanoDate {
 
   static now() {
     return (new NanoDate()).valueOf();
-  }
-
-  static parseISO( str ) {
-    //lets capture the nanoseconds
-    //examples are: 1997-07-16T19:20:30.45+01:00, 2017-08-17T17:04:35.160744338Z
-    let match = str.match(ISO_8601_FULL)
-    var date = new NanoDate(new Date(str))
-    if (match != undefined && match.length == 2) {
-      let nanos = match[1];
-      //we should pad the nanos to the number of digits
-      nanos = parseInt(pad(nanos, 9))
-
-      //set millis
-      if (nanos > 0) {
-        date.setMilliseconds(Math.floor(nanos / MILLI_TO_NANO_DIFF))
-        nanos = nanos % MILLI_TO_NANO_DIFF
-      }
-
-      //set micros
-      if (nanos > 0) {
-        date.setMicroseconds(Math.floor(nanos / 1000))
-        nanos = nanos % 1000
-      }
-
-      //set micros
-      if (nanos > 0) {
-        date.setNanoseconds(Math.floor(nanos))
-      }
-
-    }
-    return date
   }
 
   static parse(...args) {

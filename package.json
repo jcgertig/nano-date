@@ -14,7 +14,12 @@
     "url": "git+https://github.com/jcgertig/nano-date.git"
   },
   "jest": {
-    "testPathIgnorePatterns" : ["/node_modules/", "<rootDir>/lib/"]
+    "testPathIgnorePatterns" : [
+      "/node_modules/",
+      "<rootDir>/lib/",
+      "<rootDir>/build/",
+      "<rootDir>/examples/"
+    ]
   },
   "keywords": [
     "nano",
