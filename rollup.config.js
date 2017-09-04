@@ -5,9 +5,12 @@ import replace from 'rollup-plugin-replace';
 import uglify from 'rollup-plugin-uglify';
 
 export default {
-  entry: 'src/index.js',
-  format: 'iife',
-  moduleName: 'NanoDate',
+  input: 'src/index.js',
+  output: {
+    format: 'iife',
+    file: 'build/nano-date.js'
+  },
+  name: 'NanoDate',
   plugins: [
     commonjs(),
     resolve(),
@@ -19,6 +22,5 @@ export default {
     }),
     uglify()
   ],
-  dest: 'build/nano-date.js',
-  sourceMap: true
+  sourcemap: true
 };
