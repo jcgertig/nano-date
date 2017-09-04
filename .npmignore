@@ -34,6 +34,8 @@ lib-cov
 html-report
 xunit.xml
 .babelrc
+.travis.yml
+.codeclimate.yml
 rollup.config.js
 
 .project
