@@ -15,7 +15,7 @@ export default {
       exclude: 'node_modules/**' // only transpile our source code
     }),
     replace({
-      'process.env': JSON.stringify('{}'),
+      'process.env': JSON.stringify('{}')
     }),
     uglify()
   ],

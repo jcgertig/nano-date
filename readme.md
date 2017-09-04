@@ -6,6 +6,9 @@
 [![Dependencies][deps]][package-url]
 [![Dev Dependencies][dev-deps]][package-url]
 [![License][license]][package-url]
+[![Build Status](https://travis-ci.org/jcgertig/nano-date.svg?branch=master)](https://travis-ci.org/jcgertig/nano-date)
+[![Code Climate](https://codeclimate.com/github/jcgertig/nano-date/badges/gpa.svg)](https://codeclimate.com/github/jcgertig/nano-date)
+[![Test Coverage](https://codeclimate.com/github/jcgertig/nano-date/badges/coverage.svg)](https://codeclimate.com/github/jcgertig/nano-date/coverage)
 
 __Date class that supports up to nano seconds__
 

@@ -1,0 +1,13 @@
+engines:
+  eslint:
+    enabled: false
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - javascript:
+ratings:
+  paths:
+  - src/**
+exclude_paths:
+- "src/index.test.js"
