@@ -1,0 +1,2 @@
+exclude_paths:
+- "src/index.test.js"

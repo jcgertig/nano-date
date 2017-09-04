@@ -249,15 +249,15 @@ test('test setMonth basic - 11', () => {
 });
 
 test('test setMonth basic - 12', () => {
-  let date = new NanoDate('2017-01-01T00:00:00.00Z');
+  let date = new NanoDate('2017-01-05T00:00:00.00Z');
   date.setMonth(12);
-  expect(date.getMonth()).toBe(2);
+  expect(date.getMonth()).toBe(0);
 });
 
 test('test setMonth basic - 13', () => {
-  let date = new NanoDate('2017-01-01T00:00:00.00Z');
+  let date = new NanoDate('2017-01-05T00:00:00.00Z');
   date.setMonth(13);
-  expect(date.getMonth()).toBe(3);
+  expect(date.getMonth()).toBe(1);
 });
 /*
  * Test setUTCDate
