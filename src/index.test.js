@@ -555,9 +555,9 @@ test('test setUTCNanoseconds with overflow', () => {
  * Test now
  */
 test('test now', () => {
-  let nanoDate = NanoDate.now();
-  let date = Date.now();
-  expect(nanoDate).toBe(date);
+  let nanoDate = `${NanoDate.now()}`;
+  let date = `${Date.now()}`;
+  expect(nanoDate.slice(0, nanoDate.length - 2)).toBe(date.slice(0, date.length - 2));
 });
 
 /*
