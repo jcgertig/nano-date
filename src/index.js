@@ -211,7 +211,7 @@ class NanoDate {
       const match = a.match(ISO_8601_FULL);
       if (typeof match[1] !== 'undefined') {
         const padded = padEndTo(match[1].replace('.', ''), 9);
-        let nanos = parseInt(padded, 10, Math.floor(nanos / MILLI_TO_NANO_DIFF));
+        let nanos = parseInt(padded, 10);
 
         // set milliseconds
         if (nanos > 0) {
