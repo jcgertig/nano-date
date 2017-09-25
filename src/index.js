@@ -6,7 +6,7 @@ import memoize from 'memoizerific';
 if (typeof window === 'undefined') {
   var BaseDate = Date;
 } else {
-  var BaseDate = window['Date'];
+  var BaseDate = window.Date;
 }
 
 const ISO_8601_FULL = /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|Z)?$/i;
