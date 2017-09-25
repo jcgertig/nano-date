@@ -4,9 +4,10 @@ import memoize from 'memoizerific';
 
 // Cache original 'Date' class. User may set window.Date = NanoDate;
 if (typeof window === 'undefined') {
+  /* istanbul ignore next */
   var BaseDate = Date;
 } else {
-  var BaseDate = window['Date'];
+  var BaseDate = window.Date;
 }
 
 const ISO_8601_FULL = /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|Z)?$/i;
