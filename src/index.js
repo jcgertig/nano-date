@@ -4,6 +4,7 @@ import memoize from 'memoizerific';
 
 // Cache original 'Date' class. User may set window.Date = NanoDate;
 if (typeof window === 'undefined') {
+  /* istanbul ignore next */
   var BaseDate = Date;
 } else {
   var BaseDate = window.Date;
