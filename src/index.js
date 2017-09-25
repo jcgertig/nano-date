@@ -4,9 +4,9 @@ import memoize from 'memoizerific';
 
 // Cache original 'Date' class. User may set window.Date = NanoDate;
 if (typeof window === 'undefined') {
-  var Date = Date;
+  var BaseDate = Date;
 } else {
-  var Date = window['Date'];
+  var BaseDate = window['Date'];
 }
 
 const ISO_8601_FULL = /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|Z)?$/i;
@@ -178,13 +178,13 @@ const passThroughMethods = [
 class NanoDate {
   constructor(a, b, c, d, e, f, g, h) {
     if (typeof a === 'string') {
-      this._full = onlyDigits(a) ? toNano(a) : toNano(new Date(a).valueOf() * MILLI_TO_NANO_DIFF);
+      this._full = onlyDigits(a) ? toNano(a) : toNano(new BaseDate(a).valueOf() * MILLI_TO_NANO_DIFF);
     } else if (arguments.length === 0) {
-      this._full = toNano(new Date().valueOf() * MILLI_TO_NANO_DIFF);
+      this._full = toNano(new BaseDate().valueOf() * MILLI_TO_NANO_DIFF);
     } else if (arguments.length === 1) {
       if (a instanceof NanoDate) {
         this._full = a._full;
-      } else if (a instanceof Date) {
+      } else if (a instanceof BaseDate) {
         this._full = toNano(a.valueOf() * MILLI_TO_NANO_DIFF);
       } else if (typeof a === 'number') {
         let multi = MILLI_TO_NANO_DIFF;
@@ -198,9 +198,9 @@ class NanoDate {
     } else {
       let date;
       if (typeof a === 'boolean') {
-        date = Date.UTC(b, c || 0, d || 0, e || 0, f || 0, g || 0, h || 0);
+        date = BaseDate.UTC(b, c || 0, d || 0, e || 0, f || 0, g || 0, h || 0);
       } else {
-        date = new Date(a, b, c || 0, d || 0, e || 0, f || 0, g || 0);
+        date = new BaseDate(a, b, c || 0, d || 0, e || 0, f || 0, g || 0);
       }
       this._full = toNano(date.valueOf() * MILLI_TO_NANO_DIFF);
     }
@@ -234,7 +234,7 @@ class NanoDate {
   }
 
   _setupFunctions() {
-    this._date = new Date(this.valueOf());
+    this._date = new BaseDate(this.valueOf());
     passThroughMethods.forEach((name) => {
       this[name] = (...args) => this._date[name](...args);
     });
@@ -323,7 +323,7 @@ class NanoDate {
   }
 
   static parse(...args) {
-    return Date.parse(...args);
+    return BaseDate.parse(...args);
   }
 
   static UTC(...args) {
