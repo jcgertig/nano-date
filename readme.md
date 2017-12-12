@@ -50,7 +50,7 @@ nanoDate.setMicroseconds(25); // 25
 nanoDate.setNanoseconds(25); // 25
 ```
 
-- `toString` && `toUTCString` - adds millisecond, microsecond, nanosecond as a decimal to the seconds
+- `toString`, `toUTCString` & `toISOStringFull` - adds millisecond, microsecond, nanosecond as a decimal to the seconds
 ```javascript
 nanoDate.toString(); // ie "Mon Jun 12 2017 12:57:05.089999999 GMT-0500 (CDT)"
 ```

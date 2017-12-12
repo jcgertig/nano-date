@@ -526,6 +526,12 @@ class NanoDate {
     return this._toString('toUTCString');
   }
 
+  toISOStringFull() {
+    const micro = this.getMicroseconds();
+    const nano = this.getNanoseconds();
+    return this._date.toISOString().replace('Z', `${pad(micro)}${pad(nano)}Z`);
+  }
+
   @deprecate('Use toUTCString() instead')
   toGMTString() {
     return this.toUTCString();
