@@ -641,6 +641,14 @@ test('test toGMTString', () => {
 });
 
 /*
+ * Test toISOStringFull
+ */
+test('test toISOStringFull', () => {
+  let date = new NanoDate(`${new Date('2017-01-01').valueOf()}000100`);
+  expect(date.toISOStringFull()).toBe('2017-01-01T00:00:00.000000100Z');
+});
+
+/*
  * Test not an integer handeling
  */
 test('test catch not an integer', () => {

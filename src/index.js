@@ -116,37 +116,6 @@ function notUndefined(item) {
   return typeof item !== 'undefined';
 }
 
-function buildSetFunction(scope, name, argumentNames, getMethod, valueKey, moreVarsFunc = () => {}, utc = false) {
-  function setFunction(...args) {
-    handleNotAnInteger(args, name, argumentNames);
-    const currentValue = getMethod();
-    if (currentValue !== args[0]) {
-      if (currentValue < args[0]) {
-        const v = scope._getValue.call(scope, scope, valueKey, args[0] - currentValue, utc);
-        scope._full = scope._full.plus(v).truncated();
-      } else {
-        const v = scope._getValue.call(scope, scope, valueKey, currentValue - args[0], utc);
-        scope._full = scope._full.minus(v).truncated();
-      }
-
-      if (args.length === 1 || (args.length > 1 && !notUndefined(args[1]))) {
-        scope._setupFunctions.call(scope);
-      }
-    }
-
-    if (args.length > 1 && notUndefined(args[1])) {
-      args.shift();
-      moreVarsFunc.apply(scope, args);
-    }
-
-    return getMethod();
-  }
-
-  Object.defineProperty(setFunction, 'name', { value: name, writable: false });
-
-  return setFunction.bind(scope);
-}
-
 const passThroughMethods = [
   'getFullYear',
   'getYear',
@@ -208,6 +177,158 @@ class NanoDate {
 
     this._setupFunctions();
 
+    this.proxy = new Proxy(this, {
+      get: (obj, prop) => {
+        if (prop in obj) {
+          return obj[prop];
+        } else if (passThroughMethods.indexOf(prop) > -1) {
+          return obj._date[prop].bind(obj._date);
+        } else {
+          const build = obj._buildSetFunction.bind(obj, obj);
+          switch (prop) {
+            case 'setUTCNanoseconds':
+            case 'setNanoseconds':
+              return build(
+                'setNanoseconds',
+                ['nanosecond'],
+                obj.proxy.getUTCNanoseconds,
+                NANO,
+                () => {},
+                false
+              );
+            case 'setUTCMicroseconds':
+            case 'setMicroseconds':
+              return build(
+                'setMicoseconds',
+                ['microsecond', 'nanosecond'],
+                obj.proxy.getUTCMicroseconds,
+                MICRO,
+                obj.proxy.setUTCNanoseconds,
+                false
+              );
+            case 'setUTCMilliseconds':
+            case 'setMilliseconds':
+              return build(
+                'setMilliseconds',
+                ['millisecond', 'microsecond', 'nanosecond'],
+                obj.proxy.getUTCMilliseconds,
+                MILLI,
+                obj.proxy.setUTCMicroseconds,
+                false
+              );
+            case 'setUTCSeconds':
+              return build(
+                'setUTCSeconds',
+                ['second', 'millisecond', 'microsecond', 'nanosecond'],
+                obj.proxy.getUTCSeconds,
+                SECOND,
+                obj.proxy.setUTCMilliseconds,
+                true
+              );
+            case 'setSeconds':
+              return build(
+                'setSeconds',
+                ['second', 'millisecond', 'microsecond', 'nanosecond'],
+                obj.proxy.getSeconds,
+                SECOND,
+                obj.proxy.setMilliseconds,
+                false
+              );
+            case 'setUTCMinutes':
+              return build(
+                'setUTCMinutes',
+                ['minute', 'second', 'millisecond', 'microsecond', 'nanosecond'],
+                obj.proxy.getUTCMinutes,
+                MINUTE,
+                obj.proxy.setUTCSeconds,
+                true
+              );
+            case 'setMinutes':
+              return build(
+                'setMinutes',
+                ['minute', 'second', 'millisecond', 'microsecond', 'nanosecond'],
+                obj.proxy.getMinutes,
+                MINUTE,
+                obj.proxy.setSeconds,
+                false
+              );
+            case 'setUTCHours':
+              return build(
+                'setUTCHours',
+                ['hour', 'minute', 'second', 'millisecond', 'microsecond', 'nanosecond'],
+                obj.proxy.getUTCHours,
+                HOUR,
+                obj.proxy.setUTCMinutes,
+                true
+              );
+            case 'setHours':
+              return build(
+                'setHours',
+                ['hour', 'minute', 'second', 'millisecond', 'microsecond', 'nanosecond'],
+                obj.proxy.getHours,
+                HOUR,
+                obj.proxy.setMinutes,
+                false
+              );
+            case 'setUTCDate':
+              return build(
+                'setUTCDate',
+                ['day'],
+                obj.proxy.getUTCDate,
+                DAY,
+                () => {},
+                true
+              );
+            case 'setDate':
+              return build(
+                'setDate',
+                ['day'],
+                obj.proxy.getDate,
+                DAY,
+                () => {},
+                false
+              );
+            case 'setUTCMonth':
+              return build(
+                'setUTCMonth',
+                ['month', 'day'],
+                obj.proxy.getUTCMonth,
+                MONTH,
+                obj.proxy.setUTCDate,
+                true
+              );
+            case 'setMonth':
+              return build(
+                'setMonth',
+                ['month', 'day'],
+                obj.proxy.getMonth,
+                MONTH,
+                obj.proxy.setDate,
+                false
+              );
+            case 'setUTCFullYear':
+              return build(
+                'setUTCFullYear',
+                ['year', 'month', 'day'],
+                obj.proxy.getUTCFullYear,
+                YEAR,
+                obj.proxy.setUTCMonth,
+                true
+              );
+            case 'setFullYear':
+              return build(
+                'setFullYear',
+                ['year', 'month', 'day'],
+                obj.proxy.getFullYear,
+                YEAR,
+                obj.proxy.setMonth,
+                false
+              );
+          }
+        }
+      }
+    });
+
     if (typeof a === 'string' && ISO_8601_FULL.test(a) && a.indexOf('.') > -1) {
       const match = a.match(ISO_8601_FULL);
       if (typeof match[1] !== 'undefined') {
@@ -216,31 +337,60 @@ class NanoDate {
 
         // set milliseconds
         if (nanos > 0) {
-          this.setMilliseconds(Math.floor(nanos / MILLI_TO_NANO_DIFF));
+          this.proxy.setMilliseconds(Math.floor(nanos / MILLI_TO_NANO_DIFF));
           nanos = nanos % MILLI_TO_NANO_DIFF;
         }
 
         // set microseconds
         if (nanos > 0) {
-          this.setMicroseconds(Math.floor(nanos / 1000));
+          this.proxy.setMicroseconds(Math.floor(nanos / 1000));
           nanos = nanos % 1000;
         }
 
         // set nanoseconds
         if (nanos > 0) {
-          this.setNanoseconds(Math.floor(nanos));
+          this.proxy.setNanoseconds(Math.floor(nanos));
         }
       }
     }
+
+    return this.proxy;
+  }
+
+  @decorate(memoize(100))
+  _buildSetFunction(scope, name, argumentNames, getMethod, valueKey, moreVarsFunc = () => {}, utc = false) {
+    function setFunction(...args) {
+      handleNotAnInteger(args, name, argumentNames);
+      const currentValue = getMethod();
+      if (currentValue !== args[0]) {
+        if (currentValue < args[0]) {
+          const v = scope._getValue.call(scope, scope, valueKey, args[0] - currentValue, utc);
+          scope._full = scope._full.plus(v).truncated();
+        } else {
+          const v = scope._getValue.call(scope, scope, valueKey, currentValue - args[0], utc);
+          scope._full = scope._full.minus(v).truncated();
+        }
+
+        if (args.length === 1 || (args.length > 1 && !notUndefined(args[1]))) {
+          scope._setupFunctions.call(scope);
+        }
+      }
+
+      if (args.length > 1 && notUndefined(args[1])) {
+        args.shift();
+        moreVarsFunc.apply(scope, args);
+      }
+
+      return getMethod();
+    }
+
+    Object.defineProperty(setFunction, 'name', { value: name, writable: false });
+
+    return setFunction.bind(scope);
   }
 
   _setupFunctions() {
     this._date = new BaseDate(this.valueOf());
-    passThroughMethods.forEach((name) => {
-      this[name] = (...args) => this._date[name](...args);
-    });
-
-    this._buildSetFunctions();
   }
 
   @decorate(memoize(250))
@@ -258,15 +408,15 @@ class NanoDate {
   }
 
   _getFullYear(utc) {
-    return utc ? this.getUTCFullYear() : this.getFullYear();
+    return utc ? this.proxy.getUTCFullYear() : this.proxy.getFullYear();
   }
 
   _getDate(utc) {
-    return utc ? this.getUTCDate() : this.getDate();
+    return utc ? this.proxy.getUTCDate() : this.proxy.getDate();
   }
 
   _getMonth(utc) {
-    return utc ? this.getUTCMonth() : this.getMonth();
+    return utc ? this.proxy.getUTCMonth() : this.proxy.getMonth();
   }
 
   _getDays(unit, utc = false) {
@@ -286,7 +436,6 @@ class NanoDate {
     if (diff.greaterThan(11)) {
       diff = month.minus(base);
     }
-    // console.log('days between', res.toNumber(), diff.toNumber(), month.toNumber());
     if (diff.lessThan(month)) {
       return res.plus(this._getDaysBetween(diff, month, daysForMonth.bind(null, currentYear)));
     }
@@ -340,11 +489,11 @@ class NanoDate {
   }
 
   valueOfWithMicro() {
-    return parseFloat(`${this.valueOf()}.${pad(this.getMicroseconds())}`, 10);
+    return parseFloat(`${this.valueOf()}.${pad(this.proxy.getMicroseconds())}`, 10);
   }
 
   valueOfWithNano() {
-    return `${this.valueOfWithMicro().toFixed(3)}${pad(this.getNanoseconds())}`;
+    return `${this.valueOfWithMicro().toFixed(3)}${pad(this.proxy.getNanoseconds())}`;
   }
 
   getMicroseconds() {
@@ -356,147 +505,19 @@ class NanoDate {
   }
 
   getUTCMicroseconds() {
-    return this.getMicroseconds();
+    return this.proxy.getMicroseconds();
   }
 
   getNanoseconds() {
     return this._full
       .minus(this.valueOf() * MILLI_TO_NANO_DIFF)
-      .minus(this.getMicroseconds() * 1000)
+      .minus(this.proxy.getMicroseconds() * 1000)
       .truncated()
       .toNumber();
   }
 
   getUTCNanoseconds() {
-    return this.getNanoseconds();
-  }
-
-  _buildSetFunctions() {
-    const build = buildSetFunction.bind(this, this);
-
-    this.setUTCNanoseconds = this.setNanoseconds = build(
-      'setNanoseconds',
-      ['nanosecond'],
-      this.getUTCNanoseconds,
-      NANO
-    );
-
-    this.setUTCMicroseconds = this.setMicroseconds = build(
-      'setMicoseconds',
-      ['microsecond', 'nanosecond'],
-      this.getUTCMicroseconds,
-      MICRO,
-      this.setUTCNanoseconds
-    );
-
-    this.setUTCMilliseconds = this.setMilliseconds = build(
-      'setMilliseconds',
-      ['millisecond', 'microsecond', 'nanosecond'],
-      this.getUTCMilliseconds,
-      MILLI,
-      this.setUTCMicroseconds
-    );
-
-    this.setUTCSeconds = build(
-      'setUTCSeconds',
-      ['second', 'millisecond', 'microsecond', 'nanosecond'],
-      this.getUTCSeconds,
-      SECOND,
-      this.setUTCMilliseconds,
-      true
-    );
-
-    this.setSeconds = build(
-      'setSeconds',
-      ['second', 'millisecond', 'microsecond', 'nanosecond'],
-      this.getSeconds,
-      SECOND,
-      this.setMilliseconds
-    );
-
-    this.setUTCMinutes = build(
-      'setUTCMinutes',
-      ['minute', 'second', 'millisecond', 'microsecond', 'nanosecond'],
-      this.getUTCMinutes,
-      MINUTE,
-      this.setUTCSeconds,
-      true
-    );
-
-    this.setMinutes = build(
-      'setMinutes',
-      ['minute', 'second', 'millisecond', 'microsecond', 'nanosecond'],
-      this.getMinutes,
-      MINUTE,
-      this.setSeconds
-    );
-
-    this.setUTCHours = build(
-      'setUTCHours',
-      ['hour', 'minute', 'second', 'millisecond', 'microsecond', 'nanosecond'],
-      this.getUTCHours,
-      HOUR,
-      this.setUTCMinutes,
-      true
-    );
-
-    this.setHours = build(
-      'setHours',
-      ['hour', 'minute', 'second', 'millisecond', 'microsecond', 'nanosecond'],
-      this.getHours,
-      HOUR,
-      this.setMinutes
-    );
-
-    this.setUTCDate = build(
-      'setUTCDate',
-      ['day'],
-      this.getUTCDate,
-      DAY,
-      () => {},
-      true
-    );
-
-    this.setDate = build(
-      'setDate',
-      ['day'],
-      this.getDate,
-      DAY
-    );
-
-    this.setUTCMonth = build(
-      'setUTCMonth',
-      ['month', 'day'],
-      this.getUTCMonth,
-      MONTH,
-      this.setUTCDate,
-      true
-    );
-
-    this.setMonth = build(
-      'setMonth',
-      ['month', 'day'],
-      this.getMonth,
-      MONTH,
-      this.setDate
-    );
-
-    this.setUTCFullYear = build(
-      'setUTCFullYear',
-      ['year', 'month', 'day'],
-      this.getUTCFullYear,
-      YEAR,
-      this.setUTCMonth,
-      true
-    );
-
-    this.setFullYear = build(
-      'setFullYear',
-      ['year', 'month', 'day'],
-      this.getFullYear,
-      YEAR,
-      this.setMonth
-    );
+    return this.proxy.getNanoseconds();
   }
 
   setTime(time) {
@@ -506,14 +527,14 @@ class NanoDate {
   }
 
   setUTCTime(time) {
-    return this.setTime(time);
+    return this.proxy.setTime(time);
   }
 
   _toString(funcName) {
     const split = this._date[funcName]().split(' GMT');
-    const milli = this.getMilliseconds();
-    const micro = this.getMicroseconds();
-    const nano = this.getNanoseconds();
+    const milli = this.proxy.getMilliseconds();
+    const micro = this.proxy.getMicroseconds();
+    const nano = this.proxy.getNanoseconds();
     split[0] += `.${pad(milli)}${pad(micro)}${pad(nano)}`;
     return split.join(' GMT');
   }
@@ -527,8 +548,8 @@ class NanoDate {
   }
 
   toISOStringFull() {
-    const micro = this.getMicroseconds();
-    const nano = this.getNanoseconds();
+    const micro = this.proxy.getMicroseconds();
+    const nano = this.proxy.getNanoseconds();
     return this._date.toISOString().replace('Z', `${pad(micro)}${pad(nano)}Z`);
   }
 
