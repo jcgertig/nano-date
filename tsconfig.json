@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+    "module": "commonjs",
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "target": "es2017",
+    "sourceRoot": "./src",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "lib": ["es2017", "dom"]
+	},
+	"exclude": [
+		"**/__tests__"
+	]
+}

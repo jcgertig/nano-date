@@ -1,0 +1,57 @@
+{
+  "extends": ["tslint-config-semistandard", "tslint-config-prettier"],
+  "rules": {
+    "max-line-length": {
+      "options": [240]
+    },
+    "member-ordering": {
+      "severity": "warning",
+      "options": {
+        "order": [
+          "public-static-field",
+          "protected-static-field",
+          "private-static-field",
+          "public-static-method",
+          "protected-static-method",
+          "private-static-method",
+          "public-instance-field",
+          "protected-instance-field",
+          "private-instance-field",
+          "public-constructor",
+          "protected-constructor",
+          "private-constructor",
+          "public-instance-method",
+          "protected-instance-method",
+          "private-instance-method"
+        ]
+      }
+    },
+    "quotemark": [true, "single", "jsx-double"],
+    "no-angle-bracket-type-assertion": false,
+    "semicolon": [true, "always", "strict-bound-class-methods"],
+    "await-promise": [true, "Thenable"],
+    "new-parens": true,
+    "no-arg": true,
+    "no-unused-variable": false,
+    "no-bitwise": false,
+    "space-before-function-paren": true,
+    "no-conditional-assignment": true,
+    "no-consecutive-blank-lines": false,
+    "no-console": {
+      "severity": "warning",
+      "options": [
+        "debug",
+        "info",
+        "log",
+        "time",
+        "timeEnd",
+        "trace"
+      ]
+    }
+  },
+  "jsRules": {
+    "max-line-length": {
+      "options": [240]
+    }
+  }
+}

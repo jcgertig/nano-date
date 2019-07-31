@@ -4,9 +4,11 @@ env:
     - GIT_COMMITTED_AT=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then git log -1 --pretty=format:%ct; else git log -1 --skip 1 --pretty=format:%ct; fi)
 language: node_js
 node_js:
-  - "6"
-  - "7"
   - "8"
+  - "9"
+  - "10"
+  - "11"
+  - "12"
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
   - chmod +x ./cc-test-reporter

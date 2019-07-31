@@ -34,10 +34,12 @@ lib-cov
 html-report
 xunit.xml
 .babelrc
+babel.config.js
 .travis.yml
 .codeclimate.yml
 .hound.yml
 rollup.config.js
+__tests__
 
 .project
 .idea
@@ -53,3 +55,9 @@ Thumbs.db
 .LSOverride
 .Spotlight-V100
 .Trashes
+
+.prettierignore
+.prettierrc
+tsconfig.json
+tslint.json
+.editorconfig

@@ -1,11 +1,13 @@
 engines:
-  eslint:
-    enabled: false
+  tslint:
+    enabled: true
+    config: tslint.json
   duplication:
     enabled: true
     config:
       languages:
-      - javascript:
+      - javascript
+      - typescript
 ratings:
   paths:
   - src/**
