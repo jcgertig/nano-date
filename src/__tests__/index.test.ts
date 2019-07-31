@@ -1,4 +1,4 @@
-import NanoDate from './index.js';
+import NanoDate from '../index';
 
 /*
  * Test basic string parsing
@@ -80,9 +80,11 @@ test('test parsing from nanoseconds', () => {
 test('test parsing from unknown type', () => {
   let date;
   try {
-    date = new NanoDate({});
+    date = new NanoDate({} as any);
   } catch (e) {
-    expect(e.toString()).toBe('Error: Input not of any type that can be converted to a date');
+    expect(e.toString()).toBe(
+      'Error: Input not of any type that can be converted to a date'
+    );
   }
 });
 
@@ -365,7 +367,6 @@ test('test setHours basic', () => {
   expect(date.getHours()).toBe(10);
 });
 
-
 /*
  * Test setUTCMinutes
  */
@@ -557,14 +558,16 @@ test('test setUTCNanoseconds with overflow', () => {
 test('test now', () => {
   let nanoDate = `${NanoDate.now()}`;
   let date = `${Date.now()}`;
-  expect(nanoDate.slice(0, nanoDate.length - 2)).toBe(date.slice(0, date.length - 2));
+  expect(nanoDate.slice(0, nanoDate.length - 2)).toBe(
+    date.slice(0, date.length - 2)
+  );
 });
 
 /*
  * Test UTC
  */
 test('test UTC', () => {
-  let nanoDate = NanoDate.UTC(2017, 1, 1);
+  let nanoDate = new NanoDate(NanoDate.UTC(2017, 1, 1));
   expect(nanoDate.getUTCFullYear()).toBe(2017);
   expect(nanoDate.getUTCMonth()).toBe(1);
   expect(nanoDate.getUTCDate()).toBe(1);
@@ -654,8 +657,10 @@ test('test toISOStringFull', () => {
 test('test catch not an integer', () => {
   let date = new NanoDate(`${new Date('2017-01-01').valueOf()}000100`);
   try {
-    date.setUTCNanoseconds('200');
+    date.setUTCNanoseconds('200' as any);
   } catch (e) {
-    expect(e.toString()).toBe('Error: Parameter nanosecond value for setNanoseconds has to be an integer.');
+    expect(e.toString()).toBe(
+      'Error: Parameter nanosecond value for setNanoseconds has to be an integer.'
+    );
   }
 });

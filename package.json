@@ -2,24 +2,28 @@
   "name": "nano-date",
   "version": "3.0.0",
   "description": "Date class that supports up to nano seconds",
-  "main": "lib/index.js",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
-    "rollup": "BABEL_ENV=rollup rollup -c",
-    "compile": "BABEL_ENV=npm babel src/ --out-dir lib",
-    "prepublish": "npm run compile && npm run rollup",
-    "test": "BABEL_ENV=development jest --coverage"
+    "build:types": "tsc --project ./ --declaration --emitDeclarationOnly",
+    "build:js": "babel src --out-dir dist --extensions \".ts,.tsx\" --source-maps inline",
+    "cleanDir:build": "rimraf dist",
+    "cleanDir:docs": "rimraf dist-docs",
+    "transpile": "run-s build:types build:js",
+    "copy:public": "copy public dist-docs",
+    "typedoc": "typedoc --out dist-docs src --inlineSourceMap --mode modules --module system --excludePrivate --ignoreCompilerErrors",
+    "build": "run-s clean:build transpile",
+    "test:types": "tsc --project ./ --noEmit",
+    "test:types:watch": "npm run test:types -- --watch",
+    "test:lint": "tslint --project tsconfig.json \"src/**/*.{ts,tsx}\"",
+    "test:unit": "jest --coverage",
+    "test": "run-s test:types test:lint test:unit",
+    "build:docs": "run-s cleanDir:docs typedoc",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jcgertig/nano-date.git"
-  },
-  "jest": {
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "<rootDir>/lib/",
-      "<rootDir>/build/",
-      "<rootDir>/examples/"
-    ]
   },
   "keywords": [
     "nano",
@@ -38,27 +42,47 @@
   "bugs": {
     "url": "https://github.com/jcgertig/nano-date/issues"
   },
-  "homepage": "https://github.com/jcgertig/nano-date#readme",
+  "homepage": "https://github.com/jcgertig/nano-date#README",
   "dependencies": {
-    "bignumber.js": "^4.0.4",
-    "core-decorators": "^0.20.0",
+    "bignumber.js": "^9.0.0",
     "memoizerific": "^1.11.2"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-jest": "^20.0.3",
-    "babel-plugin-external-helpers": "^6.22.0",
-    "babel-plugin-transform-decorators-legacy": "^1.3.4",
-    "babel-plugin-transform-es2015-modules-umd": "^6.24.1",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-stage-0": "^6.24.1",
-    "jest": "^20.0.4",
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "@babel/preset-typescript": "^7.3.3",
+    "@types/jest": "^24.0.16",
+    "chai": "^4.2.0",
+    "copy-dir-cli": "^0.0.3",
+    "jest": "^24.8.0",
+    "npm-run-all": "^4.1.5",
     "regenerator-runtime": "^0.11.0",
-    "rollup": "^0.49.2",
-    "rollup-plugin-babel": "^3.0.2",
-    "rollup-plugin-commonjs": "^8.2.0",
-    "rollup-plugin-node-resolve": "^3.0.0",
-    "rollup-plugin-replace": "^1.1.1",
-    "rollup-plugin-uglify": "^2.0.1"
+    "rimraf": "^2.6.3",
+    "sinon": "^7.3.2",
+    "tslint": "^5.18.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-config-semistandard": "^8.0.1",
+    "typedoc": "^0.15.0",
+    "typescript": "^3.5.3"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx"
+    ],
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "<rootDir>/lib/",
+      "<rootDir>/build/",
+      "<rootDir>/examples/"
+    ]
   }
 }

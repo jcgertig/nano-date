@@ -1,2 +1,1 @@
-jshint:
-  config_file: .jshintrc
+tslint: config_file: tslint.json;
