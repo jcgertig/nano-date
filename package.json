@@ -12,7 +12,7 @@
     "transpile": "run-s build:types build:js",
     "copy:public": "copy public dist-docs",
     "typedoc": "typedoc --out dist-docs src --inlineSourceMap --mode modules --module system --excludePrivate --ignoreCompilerErrors",
-    "build": "run-s clean:build transpile",
+    "build": "run-s cleanDir:build transpile",
     "test:types": "tsc --project ./ --noEmit",
     "test:types:watch": "npm run test:types -- --watch",
     "test:lint": "tslint --project tsconfig.json \"src/**/*.{ts,tsx}\"",
