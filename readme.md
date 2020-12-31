@@ -12,7 +12,7 @@
 
 __Date class that supports up to nano seconds__
 
-All of the normal date class functions with a few addtions.
+All of the normal date class functions with a few additions.
 
 If you pass a number in the constructor it will assume milliseconds however if
 you pass in a string of numbers it will assume nanoseconds.
